@@ -13,6 +13,7 @@ type TestStruct struct {
 	B *string `ha:"encrypt"`
 	C string
 	D *string
+	E *string `ha:"encrypt"`
 }
 
 func TestEncryptStruct(t *testing.T) {
@@ -49,6 +50,9 @@ func TestEncryptStruct(t *testing.T) {
 	if *s.D != "d" {
 		t.Errorf("String pointer field should not be encrypted: expected %s, found %s", "d", *s.D)
 	}
+	if s.E != nil {
+		t.Errorf("Nil field should left untouched: expected %s, found %s", "nil", *s.E)
+	}
 }
 
 func TestDecryptStruct(t *testing.T) {
@@ -76,5 +80,8 @@ func TestDecryptStruct(t *testing.T) {
 	}
 	if *s.D != "l5GzbIWadaqx0XAAFRa4MFl2LPy6mUFOvesW/nh7mZc=" {
 		t.Errorf("String pointer field should not be encrypted: expected %s, found %s", "l5GzbIWadaqx0XAAFRa4MFl2LPy6mUFOvesW/nh7mZc=", *s.D)
+	}
+	if s.E != nil {
+		t.Errorf("Nil field should left untouched: expected %s, found %s", "nil", *s.E)
 	}
 }
