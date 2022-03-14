@@ -17,7 +17,7 @@ func EncryptStruct(e encryption.StringEncryptor, v interface{}) error {
 		return fmt.Errorf("type error: v must be a pointer to a struct")
 	}
 	for i := 0; i < rv.NumField(); i++ {
-		if rvt.Field(i).Tag.Get("ha") != "encrypt" {
+		if rvt.Field(i).Tag.Get("ha") != "encrypted" {
 			continue
 		}
 		switch rv.Field(i).Kind() {
@@ -53,7 +53,7 @@ func DecryptStruct(e encryption.StringEncryptor, v interface{}) error {
 		return fmt.Errorf("type error: v must be a pointer to a struct")
 	}
 	for i := 0; i < rv.NumField(); i++ {
-		if rvt.Field(i).Tag.Get("ha") != "encrypt" {
+		if rvt.Field(i).Tag.Get("ha") != "encrypted" {
 			continue
 		}
 		switch rv.Field(i).Kind() {

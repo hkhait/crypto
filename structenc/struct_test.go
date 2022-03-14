@@ -9,11 +9,11 @@ import (
 const password = "password"
 
 type TestStruct struct {
-	A string  `ha:"encrypt"`
-	B *string `ha:"encrypt"`
+	A string  `ha:"encrypted"`
+	B *string `ha:"encrypted"`
 	C string
 	D *string
-	E *string `ha:"encrypt"`
+	E *string `ha:"encrypted"`
 }
 
 func TestEncryptStruct(t *testing.T) {
