@@ -37,7 +37,10 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		w.WriteString(ciphertext)
+		_, err = w.WriteString(ciphertext)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	if *decrypt {
@@ -49,7 +52,10 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		w.WriteString(plaintext)
+		_, err = w.WriteString(plaintext)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 }
