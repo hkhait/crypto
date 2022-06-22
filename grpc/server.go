@@ -9,14 +9,16 @@ import (
 
 type CryptoServer struct {
 	cryptoservice.UnimplementedCryptoServiceServer
-	encryptor pbe.PBEStringPasswordEncryptor
+	password string
 }
 
-func NewCryptoServer(encyptor pbe.PBEStringPasswordEncryptor) *CryptoServer {
-	return &CryptoServer{encryptor: encyptor}
+func NewCryptoServer(password string) *CryptoServer {
+	return &CryptoServer{password: password}
 }
 
 func (s *CryptoServer) Decrypt(ctx context.Context, in *cryptoservice.DecryptRequest) (*cryptoservice.DecryptResponse, error) {
-	plaintext, err := s.encryptor.Decrypt(in.GetCiphertext())
+	encryptor := pbe.NewStandardPBEStringEncryptor()
+	encryptor.SetPassword(s.password)
+	plaintext, err := encryptor.Decrypt(in.GetCiphertext())
 	return &cryptoservice.DecryptResponse{Plaintext: plaintext}, err
 }
