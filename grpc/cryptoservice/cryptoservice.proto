@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/hkhait/crypto/grpc/cryptoservice";
+
+package cryptoservice;
+
+service CryptoService {
+    rpc Decrypt (DecryptRequest) returns (DecryptResponse) {}
+}
+
+message DecryptRequest {
+    string ciphertext = 1;
+}
+
+message DecryptResponse {
+    string plaintext = 1;
+}
