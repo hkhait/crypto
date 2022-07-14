@@ -16,13 +16,13 @@ import (
 
 func main() {
 
-	password := flag.String("password", os.Getenv("DECRYPT_PASSWORD"), "password")
-	ciphertext := flag.String("ciphertext", "-", "ciphertext")
-	plaintext := flag.String("plaintext", "-", "plaintext")
-	encrypt := flag.Bool("encrypt", false, "encrypt")
-	decrypt := flag.Bool("decrypt", false, "decrypt")
-	serverMode := flag.Bool("server", false, "activate server mode")
-	serverPort := flag.Int("port", 8080, "the server port")
+	password := flag.String("password", os.Getenv("DECRYPT_PASSWORD"), "the password used to encrypt/decrypt")
+	ciphertext := flag.String("ciphertext", "-", "the ciphertext to be decrypted, read from stdin if not specified")
+	plaintext := flag.String("plaintext", "-", "the plaintext to be encrypted, read from stdin if not specified")
+	encrypt := flag.Bool("encrypt", false, "encrypt mode")
+	decrypt := flag.Bool("decrypt", false, "decrypt mode")
+	serverMode := flag.Bool("server", false, "run decryptor as GRPC server")
+	serverPort := flag.Int("port", 8080, "the server port when running as GRPC server")
 	flag.Parse()
 
 	if *encrypt && *decrypt {
@@ -38,30 +38,56 @@ func main() {
 	if *encrypt {
 		if *plaintext == "-" {
 			r := bufio.NewReader(os.Stdin)
-			*plaintext, _ = r.ReadString(0)
-		}
-		ciphertext, err := encryptor.Encrypt(*plaintext)
-		if err != nil {
-			panic(err)
-		}
-		_, err = w.WriteString(ciphertext)
-		if err != nil {
-			panic(err)
+			s := bufio.NewScanner(r)
+			for s.Scan() {
+				encryptor := pbe.NewStandardPBEStringEncryptor()
+				encryptor.SetPassword(*password)
+				ciphertext, err := encryptor.Encrypt(s.Text())
+				if err != nil {
+					panic(err)
+				}
+				fmt.Fprintln(w, ciphertext)
+				if err != nil {
+					panic(err)
+				}
+			}
+		} else {
+			ciphertext, err := encryptor.Encrypt(*plaintext)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Fprintln(w, ciphertext)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 
 	if *decrypt {
 		if *ciphertext == "-" {
 			r := bufio.NewReader(os.Stdin)
-			*ciphertext, _ = r.ReadString(0)
-		}
-		plaintext, err := encryptor.Decrypt(*ciphertext)
-		if err != nil {
-			panic(err)
-		}
-		_, err = w.WriteString(plaintext)
-		if err != nil {
-			panic(err)
+			s := bufio.NewScanner(r)
+			for s.Scan() {
+				decryptor := pbe.NewStandardPBEStringEncryptor()
+				decryptor.SetPassword(*password)
+				plaintext, err := decryptor.Decrypt(s.Text())
+				if err != nil {
+					panic(err)
+				}
+				fmt.Fprintln(w, plaintext)
+				if err != nil {
+					panic(err)
+				}
+			}
+		} else {
+			plaintext, err := encryptor.Decrypt(*ciphertext)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Fprintln(w, plaintext)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 
